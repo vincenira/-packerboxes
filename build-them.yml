@@ -1,0 +1,14 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    boxes:
+      - ubuntu_2104
+    versions: {}
+
+  tasks:
+
+    - include_tasks: common/build-it.yml
+      with_items: "{{ boxes }}"

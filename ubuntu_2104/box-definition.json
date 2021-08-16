@@ -1,0 +1,100 @@
+{
+    "variables": {
+      "version": "",
+      "cloud_token": "{{ env `VAGRANT_CLOUD_TOKEN` }}"
+    },
+    "builders": [
+        {
+          "type": "virtualbox-iso",
+          "boot_command": [
+            "<esc><wait>",
+            "<esc><wait>",
+            "<enter><wait>",
+            "/install/vmlinuz",
+            " auto=true",
+            " url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg",
+            " locale=en_US<wait>",
+            " console-setup/ask_detect=false<wait>",
+            " console-setup/layoutcode=us<wait>",
+            " console-setup/modelcode=pc105<wait>",
+            " debconf/frontend=noninteractive<wait>",
+            " debian-installer=en_US<wait>",
+            " fb=false<wait>",
+            " initrd=/install/initrd.gz<wait>",
+            " kbd-chooser/method=us<wait>",
+            " keyboard-configuration/layout=USA<wait>",
+            " keyboard-configuration/variant=USA<wait>",
+            " netcfg/get_domain=vm<wait>",
+            " netcfg/get_hostname=vagrant<wait>",
+            " grub-installer/bootdev=/dev/sda<wait>",
+            " noapic<wait>",
+            " -- <wait>",
+            "<enter><wait>"
+          ],
+          "boot_wait": "10s",
+          "disk_size": 51200,
+          "guest_os_type": "Ubuntu_64",
+          "headless": true,
+          "http_directory": "http",
+          "iso_urls": [
+            "ubuntu-21.04-live-server-arm64.iso",
+            "https://cdimage.ubuntu.com/releases/21.04/release/ubuntu-21.04-live-server-arm64.iso"
+          ],
+          "iso_checksum": "sha256:6b60e12a344212855c9658acfe8593f37cd066ea7f2d32f0254a8478cd23c2e5",
+          "ssh_username": "vagrant",
+          "ssh_password": "vagrant",
+          "ssh_port": 22,
+          "ssh_wait_timeout": "1800s",
+          "shutdown_command": "echo 'vagrant'|sudo -S shutdown -P now",
+          "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
+          "virtualbox_version_file": ".vbox_version",
+          "vm_name": "packer-ubuntu-21.04-arm64",
+          "vboxmanage": [
+            [
+              "modifyvm",
+              "{{.Name}}",
+              "--memory",
+              "1024"
+            ],
+            [
+              "modifyvm",
+              "{{.Name}}",
+              "--cpus",
+              "1"
+            ]
+          ]
+        }
+    ],
+    "provisioners": [
+      {
+        "type": "shell",
+        "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+        "script": "scripts/ansible.sh"
+      },
+      {
+        "type": "shell",
+        "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+        "script": "scripts/setup.sh"
+      },
+      {
+        "type": "shell",
+        "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+        "script": "scripts/cleanup.sh"
+      }
+    ],
+    "post-processors": [
+      [
+        {
+          "output": "builds/{{.Provider}}-ubuntu2104.box",
+          "type": "vagrant"
+        },
+        {
+          "type": "vagrant-cloud",
+          "box_tag": "vincenira/ubuntu_2104",
+          "access_token": "{{user `cloud_token`}}",
+          "version": "{{user `version`}}"
+        }
+      ]
+    ]
+  }
+  
