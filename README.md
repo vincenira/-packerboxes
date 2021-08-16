@@ -1,5 +1,5 @@
 # Vincenira's Vagrant custom image built with packer
-![Valid Packer syntax](https://github.com/vincenira/packerboxes/actions/workflows/Valid%20Packer%20Syntax/badge.svg)
+![Valid Packer syntax](https://github.com/vincenira/packerboxes/actions/workflows/validate.yml/badge.svg)
 
 This project is for building all the vincenira's vagrant boxes. Each box should be valid to run on VirtualBox.
 
